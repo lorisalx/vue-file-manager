@@ -5,7 +5,7 @@
     <div class="body">
       <Item v-for="(r, index) in items" :item="r" @item-clicked="getItems" :key="index" class="fileitem" />
       <div v-if="pdf !== null">
-        <PdfModal :source="pdf" :visible="pdf !== null" @close="closePdfModal" />
+        <PdfModal :fileName="modalFileName" :source="pdf" :visible="pdf !== null" @close="closePdfModal" />
       </div>
     </div>
   </div>
@@ -33,7 +33,8 @@ export default {
         { 'name': 'test3', 'type': 'folder' },
         { 'name': 'filetest', 'type': 'file' }
       ],
-      pdf: null
+      pdf: null,
+      modalFileName: null,
     }
   },
   created() {
@@ -61,7 +62,9 @@ export default {
               let path = encodeURIComponent(pdfPath.join('/'));
               const response = await axios.get(`http://localhost:3000/pdf/${path}`, { responseType: 'blob' });
               const url = window.URL.createObjectURL(new Blob([response.data]));
-              this.pdf = url;            }
+              this.pdf = url;            
+              this.modalFileName = item.name;
+            }
           }
           catch (error) {
             console.error('Error retrieving pdf content:', error);
@@ -91,8 +94,8 @@ export default {
 
 <style>
 .filemanager {
-  width: 1000px;
-  height: 600px;
+  width: auto;
+  height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -125,7 +128,7 @@ export default {
 .fileitem:hover {
   cursor: pointer;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
-  background-color: #e6e6e6;
+  background-color: rgb(102, 177, 255, 0.2);
 }
 
 .topbar {

@@ -1,21 +1,21 @@
 <template>
 <div>
-  <span class="path" v-for="(r, index) in path" @click="handlePathClick(index)">
-    {{ r }}
+  <span class="path" v-for="(item, index) in path" @click="handlePathClick(index)">
+    {{ item }}
   </span>
 </div>
 </template>
 
 <script>
-const path = ["FileExplorer", "src", "components"];
+
 export default {
   name: 'TopBar',
   props: {
     path: Array
   },
   methods: {
-    handlePathClick(r) {
-      this.$emit('path-clicked', r);
+    handlePathClick(item) {
+      this.$emit('path-clicked', item);
     }
   }
 }
@@ -31,7 +31,7 @@ export default {
 }
 
 .path:not(:last-child):hover {
-  color: #007bff;
+  color: #409EFF;  
 }
 
 .path:not(:last-child)::after {

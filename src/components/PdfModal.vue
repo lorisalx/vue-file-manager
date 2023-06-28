@@ -2,7 +2,10 @@
   <div class="modal" v-if="visible">
     <div class="modal-background" @click="close"></div>
     <div class="modal-content">
-      <VuePdfEmbed :source="source" :width="800" :height="600"/>
+      <div class="modal-header">
+        <p>{{ fileName }}</p>
+      </div>
+      <VuePdfEmbed class="modal-pdf" :source="source" :width="800" :height="600"/>
     </div>
     <button class="modal-close is-large" @click="close"></button>
   </div>
@@ -23,6 +26,10 @@ export default {
     },
     visible: {
       type: Boolean,
+      required: true
+    },
+    fileName: {
+      type: String,
       required: true
     }
   },
@@ -58,13 +65,15 @@ export default {
 
 .modal-content {
   background: white;
-  padding: 20px;
   border-radius: 5px;
   max-width: 90%;
   max-height: 90%;
   overflow: auto;
 }
 
+.modal-pdf {
+  padding: 20px;
+}
 .modal-close {
   position: absolute;
   top: 10px;
@@ -73,5 +82,11 @@ export default {
   border: none;
   font-size: 30px;
   cursor: pointer;
+}
+
+.modal-header {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
 }
 </style>

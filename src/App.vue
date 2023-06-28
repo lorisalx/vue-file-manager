@@ -24,4 +24,8 @@ export default {
   color: #2c3e50;
   padding: 5%;
 }
+
+body {
+  background-color: #F4F5F7;
+}
 </style>
