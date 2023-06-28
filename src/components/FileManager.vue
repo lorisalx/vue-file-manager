@@ -1,28 +1,28 @@
 <template>
   <div class="filemanager">
     <TopBar :path=currentPath @path-clicked="getPath" class="topbar"></TopBar>
+    <div class="divider"></div>
     <div class="body">
-      <Item
-      v-for="(r, index) in items"
-      :item="r"
-      @item-clicked="getItems"
-      :key="index"
-      class="fileitem"
-    />
+      <Item v-for="(r, index) in items" :item="r" @item-clicked="getItems" :key="index" class="fileitem" />
+      <div v-if="pdf !== null">
+        <PdfModal :source="pdf" :visible="pdf !== null" @close="closePdfModal" />
+      </div>
     </div>
-
   </div>
 </template>
 
 <script>
 import Item from './Item.vue'
 import TopBar from './TopBar.vue'
-import axios from 'axios';
+import axios from 'axios'
+import PdfModal from './PdfModal.vue'
+
 export default {
   name: 'FileManager',
   components: {
     Item,
-    TopBar
+    TopBar,
+    PdfModal
   },
   data() {
     return {
@@ -32,7 +32,8 @@ export default {
         { 'name': 'test2', 'type': 'folder' },
         { 'name': 'test3', 'type': 'folder' },
         { 'name': 'filetest', 'type': 'file' }
-      ]
+      ],
+      pdf: null
     }
   },
   created() {
@@ -41,30 +42,48 @@ export default {
   methods: {
     async getItems(item) {
       if (item.type === 'folder') {
-        
+
         try {
           this.currentPath.push(item.name);
           let path = encodeURIComponent(this.currentPath.join('/'));
           const response = await axios.get(`http://localhost:3000/api/files/${path}`);
           const folderContent = response.data;
-          console.log(folderContent); 
+          console.log(folderContent);
           this.items = folderContent;
         } catch (error) {
           console.error('Error retrieving folder content:', error);
         }
+      } else if (item.type == 'file') {
+          try {
+            if (item.extension === 'pdf') {
+              let pdfPath = [...this.currentPath];
+              pdfPath.push(item.name);
+              let path = encodeURIComponent(pdfPath.join('/'));
+              const response = await axios.get(`http://localhost:3000/pdf/${path}`, { responseType: 'blob' });
+              const url = window.URL.createObjectURL(new Blob([response.data]));
+              this.pdf = url;            }
+          }
+          catch (error) {
+            console.error('Error retrieving pdf content:', error);
+          }
+        
+
       }
     },
     async getPath(index) {
       try {
-          this.currentPath = this.currentPath.slice(0, index + 1)
-          let path = encodeURIComponent(this.currentPath.join('/'));
-          const response = await axios.get(`http://localhost:3000/api/files/${path}`);
-          const folderContent = response.data;
-          console.log(folderContent); 
-          this.items = folderContent;
-        } catch (error) {
-          console.error('Error retrieving folder content:', error);
-        }
+        this.currentPath = this.currentPath.slice(0, index + 1)
+        let path = encodeURIComponent(this.currentPath.join('/'));
+        const response = await axios.get(`http://localhost:3000/api/files/${path}`);
+        const folderContent = response.data;
+        console.log(folderContent);
+        this.items = folderContent;
+      } catch (error) {
+        console.error('Error retrieving folder content:', error);
+      }
+    },
+    closePdfModal() {
+      this.pdf = null
     }
   }
 }
@@ -78,10 +97,10 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  border: 1px solid black;
-  border-radius: 10px;
-  box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;  background-color: rgb(243, 242, 242);
-  padding: 10px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  padding: 20px;
+  background-color: rgb(255, 252, 252);
+  border-radius: 15px;
 }
 
 .body {
@@ -94,21 +113,29 @@ export default {
 }
 
 .fileitem {
-  border: 1px solid black;
-  background-color: white;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
   width: 95%;
-  margin: 5px;
-  padding: 5px;
+  margin: 10px 0;
+  padding: 10px;
   transition: 0.3s;
+  border-radius: 5px;
 }
 
 .fileitem:hover {
   cursor: pointer;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-  background-color: rgb(211, 211, 211);
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
+  background-color: #e6e6e6;
 }
 
 .topbar {
-  margin-bottom: 20px;
+  width: 95%;
+}
+
+.divider {
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  opacity: 0.5;
+  margin: 20px 0;
 }
 </style>

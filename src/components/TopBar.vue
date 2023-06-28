@@ -1,7 +1,7 @@
 <template>
 <div>
   <span class="path" v-for="(r, index) in path" @click="handlePathClick(index)">
-    {{ r }} <span v-if="index < path.length - 1">/</span>
+    {{ r }}
   </span>
 </div>
 </template>
@@ -20,13 +20,32 @@ export default {
   }
 }
 </script>
-<style>
-.path:last-child{
-  font-weight: bold;
+<style scoped>
+.path {
+  font-size: 16px;
+  color: #333;
+  margin: 0px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s;
 }
 
-.path:hover{
-  cursor: pointer;
-    text-decoration: underline;
+.path:not(:last-child):hover {
+  color: #007bff;
+}
+
+.path:not(:last-child)::after {
+  content: ">";
+  margin: 0 5px;
+  color: #333;
+}
+
+.path:first-child {
+  margin-left: 0;
+}
+
+.path:last-child {
+  cursor: default;
+  font-weight: bold;
 }
 </style>

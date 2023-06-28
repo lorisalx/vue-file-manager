@@ -6,7 +6,8 @@
     <img alt="Folder" src="../assets/folder.png" width="10px" height="10px"/>
     <span> {{ item.name }}</span>
   </div>
-  <div v-else>
+  <div v-else     
+  @click="handleItemClick">
     <img alt="File" src="../assets/file.png" width="10px" height="10px"/>
     <span> {{ item.name }}</span>
   </div>
@@ -25,7 +26,18 @@ export default {
   }
 }
 </script>
+<style scoped>
+div {
+  display: flex;
+  align-items: center;
+}
 
-<style>
+img {
+  margin-right: 15px;
+}
 
+span {
+  font-size: 16px;
+  color: #333;
+}
 </style>
