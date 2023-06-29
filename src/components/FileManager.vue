@@ -1,13 +1,16 @@
 <template>
   <div class="filemanager">
-    <TopBar :path=currentPath @path-clicked="getPath" class="topbar"></TopBar>
-    <div class="divider"></div>
-    <div class="body">
-      <Item v-for="(r, index) in items" :item="r" @item-clicked="getItems" :key="index" class="fileitem" />
-      <div v-if="pdf !== null">
-        <PdfModal :fileName="modalFileName" :source="pdf" :visible="pdf !== null" @close="closePdfModal" />
+      <div class="navigation">
+        <TopBar :path=currentPath @path-clicked="getPath" class="topbar"></TopBar>
       </div>
-    </div>
+
+      <div class="body">
+        <Item v-for="(r, index) in items" :item="r" @item-clicked="getItems" :key="index" class="fileitem" />
+        <div v-if="pdf !== null">
+          <PdfModal :fileName="modalFileName" :source="pdf" :visible="pdf !== null" @close="closePdfModal" />
+        </div>
+        <DocModal :fileName="modalFileName" :source="docHtml" :visible="docHtml !== null" @close="closeDocModal" />
+      </div>
   </div>
 </template>
 
@@ -16,13 +19,14 @@ import Item from './Item.vue'
 import TopBar from './TopBar.vue'
 import axios from 'axios'
 import PdfModal from './PdfModal.vue'
-
+import DocModal from './DocModal.vue'
 export default {
   name: 'FileManager',
   components: {
     Item,
     TopBar,
-    PdfModal
+    PdfModal,
+    DocModal
   },
   data() {
     return {
@@ -35,6 +39,8 @@ export default {
       ],
       pdf: null,
       modalFileName: null,
+      docHtml: null,
+
     }
   },
   created() {
@@ -65,6 +71,22 @@ export default {
               this.pdf = url;            
               this.modalFileName = item.name;
             }
+            if (item.extension === 'docx') {
+              let docPath = [...this.currentPath];
+              docPath.push(item.name);
+              let path = encodeURIComponent(docPath.join('/'));
+
+              axios.get(`http://localhost:3000/api/filees/${path}`)
+                .then(response => {
+                  this.docHtml = response.data;
+                  this.modalFileName = item.name;
+                  console.log(this.modalFileName);
+                  console.log(this.docHtml);
+                })
+                .catch(err => {
+                  console.error(err);
+                });
+            }
           }
           catch (error) {
             console.error('Error retrieving pdf content:', error);
@@ -87,6 +109,9 @@ export default {
     },
     closePdfModal() {
       this.pdf = null
+    },
+    closeDocModal () {
+      this.docHtml = null
     }
   }
 }
@@ -101,9 +126,25 @@ export default {
   align-items: flex-start;
   justify-content: flex-start;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-  padding: 20px;
   background-color: rgb(255, 252, 252);
   border-radius: 15px;
+  overflow: auto;
+  position: relative;
+}
+
+.filemanager * {
+  box-sizing: border-box;
+}
+
+.navigation {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgb(255, 252, 252);
+  width: 100%;
+  padding: 20px 20px 10px 20px;
+  border-bottom: 1px solid #e0e0e0;
+
 }
 
 .body {
@@ -112,13 +153,14 @@ export default {
   align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
-  height: 100%;
+  padding: 20px;
+
 }
 
 .fileitem {
   border: 1px solid #ccc;
   background-color: #ffffff;
-  width: 95%;
+  width: 100%;
   margin: 10px 0;
   transition: 0.3s;
   border-radius: 5px;
@@ -128,10 +170,4 @@ export default {
   width: 95%;
 }
 
-.divider {
-  border-top: 1px solid #e0e0e0;
-  width: 100%;
-  opacity: 0.5;
-  margin: 20px 0;
-}
 </style>

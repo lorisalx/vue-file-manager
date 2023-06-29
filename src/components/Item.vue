@@ -16,7 +16,7 @@
     </div>
     <div class="actions">
       <div @click="handleItemClick" >
-        <EyeIcon class="actionItem" :class="{disabled: (item.extension !== 'pdf')}"></EyeIcon>
+        <EyeIcon class="actionItem" :class="{disabled: (item.extension !== 'docx' && item.extension !== 'pdf')}"></EyeIcon>
       </div>
       <DownloadIcon class="actionItem"></DownloadIcon>
     </div>
