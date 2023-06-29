@@ -120,15 +120,8 @@ export default {
   background-color: #ffffff;
   width: 95%;
   margin: 10px 0;
-  padding: 10px;
   transition: 0.3s;
   border-radius: 5px;
-}
-
-.fileitem:hover {
-  cursor: pointer;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
-  background-color: rgb(102, 177, 255, 0.2);
 }
 
 .topbar {
